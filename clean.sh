@@ -15,8 +15,9 @@ xmlstarlet c14n --without-comments "$1" |
 	xmlstarlet ed --delete '//skip' | #Delete <skip/>
 	xmlstarlet fo > $f
 
-# 3(.3dp => 3(.3)dip
+# 3(.3)dp => 3(.3)dip
 sed -i -E 's/("[0-9]+(\.[0-9]*)?)dp"/\1dip"/g' $f
+sed -i -E 's/(>[0-9]+(\.[0-9]*)?)dp</\1dip</g' $f
 
 # 3d(i)p => 3.0 dip
 sed -i -E 's/"(-?[0-9]+)(di?p|mm)"/"\1.0\2"/g' $f
@@ -32,6 +33,9 @@ sed -i -E 's/"([0-9]+)%"/"\1.0%"/g' $f
 
 # 50% => 50.0%
 sed -i -E 's/"([0-9]+)"/"\1.0"/g' $f
+
+sed -i -E 's/>(-?[0-9]+)(di?p|mm|sp)</>\1.0\2</g' $f
+sed -i -E 's/>"([^<]*)"</>\1</g' $f
 
 #?attr/ic_toto => ?ic_toto
 #?android:attr/ic_toto => ?android:ic_toto
@@ -94,8 +98,8 @@ sed -i -E 's;android:gravity="bottom\|end";android:gravity="end\|bottom\|center"
 sed -i -E 's;android:layout_gravity="left\|bottom";android:layout_gravity="bottom\|center\|left";g' $f
 sed -i -E 's;android:layout_gravity="bottom\|left";android:layout_gravity="bottom\|center\|left";g' $f
 
-sed -i -E 's;android:layout_gravity="left\|bottom";android:layout_gravity="bottom\|center\|left";g' $f
-sed -i -E 's;android:layout_gravity="bottom\|left";android:layout_gravity="bottom\|center\|left";g' $f
+sed -i -E 's;android:gravity="left\|bottom";android:gravity="bottom\|center\|left";g' $f
+sed -i -E 's;android:gravity="bottom\|left";android:gravity="bottom\|center\|left";g' $f
 
 #---- end: Checking flags equivalencies ----
 
@@ -119,5 +123,12 @@ sed -i -E 's/"#([0-f]{6})"/"#\1ff"/g' $f
 sed -i -E 's/"#([0-f])([0-f])([0-f])([0-f])"/"#\1\1\2\2\3\3\4\4"/g' $f
 
 mv -f $f "$1"
+
+#TODO
+# android:inputType="textCapWords" / android:inputType="text|textCapWords"
+# left|center_vertical center|left
+
+
+#android:visibility=gone ?!?
 
 echo "Done processing $1"
